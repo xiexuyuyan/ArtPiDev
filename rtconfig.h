@@ -233,10 +233,6 @@
 
 /* Board extended module */
 
-#define ART_PI_USING_MEDIA_IO
-#define BSP_USING_SPI_LCD_ILI9488
-#define PKG_USING_PERSIMMON_SRC
-#define MEDIA_IO_USING_SCREEN
 /* end of Board extended module */
 
 /* Onboard Peripheral */
@@ -251,11 +247,8 @@
 #define BSP_USING_GPIO
 #define BSP_USING_UART
 #define BSP_USING_UART4
-#define BSP_USING_SPI
-#define BSP_USING_SPI2
 #define BSP_USING_SDIO
 #define BSP_USING_SDIO1
-#define BSP_USING_SDRAM
 /* end of On-chip Peripheral */
 /* end of Hardware Drivers Config */
 
