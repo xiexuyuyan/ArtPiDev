@@ -35,5 +35,4 @@ DebugConfig/
 RTE/
 settings/
 *.uvguix*
-/build/
-/Debug/
+/packages/ft6236-latest/.git/
