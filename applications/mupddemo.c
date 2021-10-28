@@ -4,7 +4,11 @@
 #include <sys/socket.h>
 #include "netdb.h"
 
-int udp_demo(void)
+#define DBG_TAG "udp_demo"
+#define DBG_LVL DBG_LOG
+#include <rtdbg.h>
+
+void udp_thread_entry(void *parameter)
 {
     int ret;
     /* 创建一个socket，协议簇为AT Socket 协议栈，类型是SOCK_DGRAM，UDP类型 */
@@ -12,7 +16,7 @@ int udp_demo(void)
     if (sock_fd  == -1)
     {
         rt_kprintf("Socket error\n");
-        return 0;
+        return;
     }
 
     // 2、绑定本地的相关信息，如果不绑定，则系统会随机分配一个端口号
@@ -50,7 +54,17 @@ int udp_demo(void)
     }
 	/* 关闭这个socket */
     closesocket(sock_fd);
-    
+}
+
+int udp_demo(void) {
+    rt_thread_t udpDemoThread;
+    udpDemoThread = rt_thread_create("udpdemo", udp_thread_entry, RT_NULL, 4096, 10, 20);
+    if (udpDemoThread == RT_NULL) {
+        LOG_D("create udp demo thread err");
+        return -RT_ENOMEM;
+    }
+    rt_thread_startup(udpDemoThread);
+
     return RT_EOK;
 }
 
