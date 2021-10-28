@@ -17,7 +17,8 @@
 
 void wifi_connect(void) {
     // rt_err_t rt_wlan_connect(const char *ssid, const char *password);
-    rt_wlan_connect("Coder OldWang", "22225555");
+    // rt_wlan_connect("Coder OldWang", "22225555");
+    rt_wlan_connect("VPN", "syrj2030");
 }
 MSH_CMD_EXPORT(wifi_connect, wifi_connect);
 
