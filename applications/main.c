@@ -13,6 +13,8 @@
 #include "drv_common.h"
 #include <wlan_mgnt.h>
 
+#include "drv_lcd_test.h"
+
 #define LED_PIN GET_PIN(I, 8)
 
 void wifi_connect(void) {
@@ -27,6 +29,10 @@ int main(void)
     rt_uint32_t count = 1;
 
     rt_pin_mode(LED_PIN, PIN_MODE_OUTPUT);
+
+    char buf[6] = {'h', 'e', 'l', 'l', 'o', '\0'};
+    addNewLine(buf);
+    freshLine();
 
     while(count++)
     {

@@ -24,14 +24,14 @@
 #endif
 
 #define DRV_DEBUG
-#define LOG_TAG             "drv.spi_lcd"
+#define LOG_TAG "drv.spi_lcd"
 #include <drv_log.h>
 
-#define LCD_DC_PIN            GET_PIN(C, 7)
+#define LCD_DC_PIN GET_PIN(C, 7)
 
-#define LCD_DEVICE(dev)     (struct drv_lcd_device*)(dev)
+#define LCD_DEVICE(dev) (struct drv_lcd_device *)(dev)
 
-#define LCD_CLEAR_SEND_NUMBER (320 * 480 *3)
+#define LCD_CLEAR_SEND_NUMBER (320 * 480 * 3)
 
 static rt_uint32_t BACK_COLOR = WHITE, FORE_COLOR = BLACK;
 static struct rt_spi_device *spi_dev_lcd;
@@ -212,17 +212,17 @@ int rt_hw_spi_lcd_init(void)
     lcd_write_data(0x28);
 #endif
 
-    lcd_write_cmd(0x3A);   //Interface Mode Control
+    lcd_write_cmd(0x3A); //Interface Mode Control
     lcd_write_data(0x66);
 
-    lcd_write_cmd(0XB0);   //Interface Mode Control
+    lcd_write_cmd(0XB0); //Interface Mode Control
     lcd_write_data(0x00);
-    lcd_write_cmd(0xB1);   //Frame rate 70HZ
+    lcd_write_cmd(0xB1); //Frame rate 70HZ
     lcd_write_data(0xB0);
     lcd_write_data(0x11);
     lcd_write_cmd(0xB4);
     lcd_write_data(0x02);
-    lcd_write_cmd(0xB6);   //RGB/MCU Interface Control
+    lcd_write_cmd(0xB6); //RGB/MCU Interface Control
     lcd_write_data(0x02);
     lcd_write_data(0x02);
 
@@ -244,7 +244,7 @@ int rt_hw_spi_lcd_init(void)
     rt_thread_mdelay(120);
     lcd_write_cmd(0x29);
 
-    rt_thread_mdelay(50);	//delay screen update to prevent screen appears white when the default color is black
+    rt_thread_mdelay(50); //delay screen update to prevent screen appears white when the default color is black
 
     return RT_EOK;
 }
@@ -344,9 +344,9 @@ void lcd_clear(rt_uint32_t color)
         /* color is 16 bit */
         for (j = 0; j < LCD_BUF_SIZE / 3; j++)
         {
-            buf[j * 3] =  data[0];
-            buf[j * 3 + 1] =  data[1];
-            buf[j * 3 + 2] =  data[2];
+            buf[j * 3] = data[0];
+            buf[j * 3 + 1] = data[1];
+            buf[j * 3 + 2] = data[2];
         }
 
         rt_pin_write(LCD_DC_PIN, PIN_HIGH);
@@ -412,8 +412,8 @@ void lcd_fill(rt_uint16_t x_start, rt_uint16_t y_start, rt_uint16_t x_end, rt_ui
     rt_uint8_t *fill_buf = RT_NULL;
 
     size = (x_end - x_start) * (y_end - y_start) * 3;
-	
-	if (size > LCD_CLEAR_SEND_NUMBER)
+
+    if (size > LCD_CLEAR_SEND_NUMBER)
     {
         /* the number of remaining to be filled */
         size_remain = size - LCD_CLEAR_SEND_NUMBER;
@@ -451,7 +451,6 @@ void lcd_fill(rt_uint16_t x_start, rt_uint16_t y_start, rt_uint16_t x_end, rt_ui
                 size = size_remain;
                 size_remain = 0;
             }
-
         }
         rt_free(fill_buf);
     }
@@ -459,7 +458,8 @@ void lcd_fill(rt_uint16_t x_start, rt_uint16_t y_start, rt_uint16_t x_end, rt_ui
     {
         for (i = y_start; i <= y_end; i++)
         {
-            for (j = x_start; j <= x_end; j++)lcd_write_three_bytes(color);
+            for (j = x_start; j <= x_end; j++)
+                lcd_write_three_bytes(color);
         }
     }
 }
@@ -498,34 +498,40 @@ void lcd_draw_line(rt_uint16_t x1, rt_uint16_t y1, rt_uint16_t x2, rt_uint16_t y
         rt_pin_write(LCD_DC_PIN, PIN_HIGH);
         rt_spi_send(spi_dev_lcd, line_buf, (x2 - x1) * 3);
 
-        return ;
+        return;
     }
 
     delta_x = x2 - x1;
     delta_y = y2 - y1;
     row = x1;
     col = y1;
-    if (delta_x > 0)incx = 1;
-    else if (delta_x == 0)incx = 0;
+    if (delta_x > 0)
+        incx = 1;
+    else if (delta_x == 0)
+        incx = 0;
     else
     {
         incx = -1;
         delta_x = -delta_x;
     }
-    if (delta_y > 0)incy = 1;
-    else if (delta_y == 0)incy = 0;
+    if (delta_y > 0)
+        incy = 1;
+    else if (delta_y == 0)
+        incy = 0;
     else
     {
         incy = -1;
         delta_y = -delta_y;
     }
-    if (delta_x > delta_y)distance = delta_x;
-    else distance = delta_y;
+    if (delta_x > delta_y)
+        distance = delta_x;
+    else
+        distance = delta_y;
     for (t = 0; t <= distance + 1; t++)
     {
         lcd_draw_point(row, col);
-        xerr += delta_x ;
-        yerr += delta_y ;
+        xerr += delta_x;
+        yerr += delta_y;
         if (xerr > distance)
         {
             xerr -= distance;
@@ -586,7 +592,8 @@ void lcd_draw_circle(rt_uint16_t x0, rt_uint16_t y0, rt_uint8_t r)
         lcd_draw_point(x0 - b, y0 + a);
         a++;
         //Bresenham
-        if (di < 0)di += 4 * a + 6;
+        if (di < 0)
+            di += 4 * a + 6;
         else
         {
             di += 10 + 4 * (a - b);
@@ -599,18 +606,20 @@ void lcd_draw_circle(rt_uint16_t x0, rt_uint16_t y0, rt_uint8_t r)
 static void lcd_show_char(rt_uint16_t x, rt_uint16_t y, rt_uint8_t data, rt_uint32_t size)
 {
     rt_uint8_t temp;
-    rt_uint8_t num = 0;;
+    rt_uint8_t num = 0;
+    ;
     rt_uint8_t pos, t;
     rt_uint32_t colortemp = FORE_COLOR;
     rt_uint8_t *font_buf = RT_NULL;
 
-    if (x > LCD_WIDTH - size / 2 || y > LCD_HEIGHT - size)return;
+    if (x > LCD_WIDTH - size / 2 || y > LCD_HEIGHT - size)
+        return;
 
     data = data - ' ';
 #ifdef ASC2_1608
     if (size == 16)
     {
-        lcd_address_set(x, y, x + size / 2 - 1, y + size - 1);//(x,y,x+8-1,y+16-1)
+        lcd_address_set(x, y, x + size / 2 - 1, y + size - 1); //(x,y,x+8-1,y+16-1)
 
         font_buf = (rt_uint8_t *)rt_malloc(size * size / 2 * 3);
         if (!font_buf)
@@ -621,8 +630,10 @@ static void lcd_show_char(rt_uint16_t x, rt_uint16_t y, rt_uint8_t data, rt_uint
                 temp = asc2_1608[(rt_uint16_t)data * size * (size / 2) / 8 + pos];
                 for (t = 0; t < 8; t++)
                 {
-                    if (temp & 0x80)colortemp = FORE_COLOR;
-                    else colortemp = BACK_COLOR;
+                    if (temp & 0x80)
+                        colortemp = FORE_COLOR;
+                    else
+                        colortemp = BACK_COLOR;
                     lcd_write_three_bytes(colortemp);
                     temp <<= 1;
                 }
@@ -635,8 +646,10 @@ static void lcd_show_char(rt_uint16_t x, rt_uint16_t y, rt_uint8_t data, rt_uint
                 temp = asc2_1608[(rt_uint16_t)data * size * (size / 2) / 8 + pos];
                 for (t = 0; t < 8; t++)
                 {
-                    if (temp & 0x80)colortemp = FORE_COLOR;
-                    else colortemp = BACK_COLOR;
+                    if (temp & 0x80)
+                        colortemp = FORE_COLOR;
+                    else
+                        colortemp = BACK_COLOR;
                     font_buf[3 * (8 * pos + t)] = colortemp >> 16;
                     font_buf[3 * (8 * pos + t) + 1] = colortemp >> 8;
                     font_buf[3 * (8 * pos + t) + 2] = colortemp;
@@ -653,121 +666,129 @@ static void lcd_show_char(rt_uint16_t x, rt_uint16_t y, rt_uint8_t data, rt_uint
 
 #ifdef ASC2_2412
         if (size == 24)
+    {
+        lcd_address_set(x, y, x + size / 2 - 1, y + size - 1);
+
+        font_buf = (rt_uint8_t *)rt_malloc(size * size / 2 * 3);
+        if (!font_buf)
         {
-            lcd_address_set(x, y, x + size / 2 - 1, y + size - 1);
-
-            font_buf = (rt_uint8_t *)rt_malloc(size * size / 2 * 3);
-            if (!font_buf)
+            /* fast show char */
+            for (pos = 0; pos < (size * 16) / 8; pos++)
             {
-                /* fast show char */
-                for (pos = 0; pos < (size * 16) / 8; pos++)
+                temp = asc2_2412[(rt_uint16_t)data * (size * 16) / 8 + pos];
+                if (pos % 2 == 0)
                 {
-                    temp = asc2_2412[(rt_uint16_t)data * (size * 16) / 8 + pos];
-                    if (pos % 2 == 0)
-                    {
-                        num = 8;
-                    }
-                    else
-                    {
-                        num = 4;
-                    }
-
-                    for (t = 0; t < num; t++)
-                    {
-                        if (temp & 0x80)colortemp = FORE_COLOR;
-                        else colortemp = BACK_COLOR;
-                        lcd_write_three_bytes(colortemp);
-                        temp <<= 1;
-                    }
-                }
-            }
-            else
-            {
-                for (pos = 0; pos < (size * 16) / 8; pos++)
-                {
-                    temp = asc2_2412[(rt_uint16_t)data * (size * 16) / 8 + pos];
-                    if (pos % 2 == 0)
-                    {
-                        num = 8;
-                    }
-                    else
-                    {
-                        num = 4;
-                    }
-
-                    for (t = 0; t < num; t++)
-                    {
-                        if (temp & 0x80)colortemp = FORE_COLOR;
-                        else colortemp = BACK_COLOR;
-                        if (num == 8)
-                        {
-                            font_buf[3 * (12 * (pos / 2) + t)] = colortemp >> 16;
-                            font_buf[3 * (12 * (pos / 2) + t) + 1] = colortemp >> 8;
-                            font_buf[3 * (12 * (pos / 2) + t) + 2] = colortemp;
-                        }
-                        else
-                        {
-                            font_buf[3 * (8 + 12 * (pos / 2) + t)] = colortemp >> 16;
-                            font_buf[3 * (8 + 12 * (pos / 2) + t) + 1] = colortemp >> 8;
-                            font_buf[3 * (8 + 12 * (pos / 2) + t) + 2] = colortemp;
-                        }
-                        temp <<= 1;
-                    }
-                }
-                rt_pin_write(LCD_DC_PIN, PIN_HIGH);
-                rt_spi_send(spi_dev_lcd, font_buf, size * size / 2 * 3);
-                rt_free(font_buf);
-            }
-        }
-        else
-#endif
-
-#ifdef ASC2_3216
-            if (size == 32)
-            {
-                lcd_address_set(x, y, x + size / 2 - 1, y + size - 1);
-
-                font_buf = (rt_uint8_t *)rt_malloc(size * size / 2 * 3);
-                if (!font_buf)
-                {
-                    /* fast show char */
-                    for (pos = 0; pos < size * (size / 2) / 8; pos++)
-                    {
-                        temp = asc2_3216[(rt_uint16_t)data * size * (size / 2) / 8 + pos];
-                        for (t = 0; t < 8; t++)
-                        {
-                            if (temp & 0x80)colortemp = FORE_COLOR;
-                            else colortemp = BACK_COLOR;
-                            lcd_write_three_bytes(colortemp);
-                            temp <<= 1;
-                        }
-                    }
+                    num = 8;
                 }
                 else
                 {
-                    for (pos = 0; pos < size * (size / 2) / 8; pos++)
-                    {
-                        temp = asc2_3216[(rt_uint16_t)data * size * (size / 2) / 8 + pos];
-                        for (t = 0; t < 8; t++)
-                        {
-                            if (temp & 0x80)colortemp = FORE_COLOR;
-                            else colortemp = BACK_COLOR;
-                            font_buf[3 * (8 * pos + t)] = colortemp >> 16;
-                            font_buf[3 * (8 * pos + t) + 1] = colortemp >> 8;
-                            font_buf[3 * (8 * pos + t) + 2] = colortemp;
-                            temp <<= 1;
-                        }
-                    }
-                    rt_pin_write(LCD_DC_PIN, PIN_HIGH);
-                    rt_spi_send(spi_dev_lcd, font_buf, size * size / 2 * 3);
-                    rt_free(font_buf);
+                    num = 4;
+                }
+
+                for (t = 0; t < num; t++)
+                {
+                    if (temp & 0x80)
+                        colortemp = FORE_COLOR;
+                    else
+                        colortemp = BACK_COLOR;
+                    lcd_write_three_bytes(colortemp);
+                    temp <<= 1;
                 }
             }
-            else
-#endif
+        }
+        else
+        {
+            for (pos = 0; pos < (size * 16) / 8; pos++)
             {
-                LOG_E("There is no any define ASC2_1208 && ASC2_2412 && ASC2_2416 && ASC2_3216 !");
+                temp = asc2_2412[(rt_uint16_t)data * (size * 16) / 8 + pos];
+                if (pos % 2 == 0)
+                {
+                    num = 8;
+                }
+                else
+                {
+                    num = 4;
+                }
+
+                for (t = 0; t < num; t++)
+                {
+                    if (temp & 0x80)
+                        colortemp = FORE_COLOR;
+                    else
+                        colortemp = BACK_COLOR;
+                    if (num == 8)
+                    {
+                        font_buf[3 * (12 * (pos / 2) + t)] = colortemp >> 16;
+                        font_buf[3 * (12 * (pos / 2) + t) + 1] = colortemp >> 8;
+                        font_buf[3 * (12 * (pos / 2) + t) + 2] = colortemp;
+                    }
+                    else
+                    {
+                        font_buf[3 * (8 + 12 * (pos / 2) + t)] = colortemp >> 16;
+                        font_buf[3 * (8 + 12 * (pos / 2) + t) + 1] = colortemp >> 8;
+                        font_buf[3 * (8 + 12 * (pos / 2) + t) + 2] = colortemp;
+                    }
+                    temp <<= 1;
+                }
             }
+            rt_pin_write(LCD_DC_PIN, PIN_HIGH);
+            rt_spi_send(spi_dev_lcd, font_buf, size * size / 2 * 3);
+            rt_free(font_buf);
+        }
+    }
+    else
+#endif
+
+#ifdef ASC2_3216
+        if (size == 32)
+    {
+        lcd_address_set(x, y, x + size / 2 - 1, y + size - 1);
+
+        font_buf = (rt_uint8_t *)rt_malloc(size * size / 2 * 3);
+        if (!font_buf)
+        {
+            /* fast show char */
+            for (pos = 0; pos < size * (size / 2) / 8; pos++)
+            {
+                temp = asc2_3216[(rt_uint16_t)data * size * (size / 2) / 8 + pos];
+                for (t = 0; t < 8; t++)
+                {
+                    if (temp & 0x80)
+                        colortemp = FORE_COLOR;
+                    else
+                        colortemp = BACK_COLOR;
+                    lcd_write_three_bytes(colortemp);
+                    temp <<= 1;
+                }
+            }
+        }
+        else
+        {
+            for (pos = 0; pos < size * (size / 2) / 8; pos++)
+            {
+                temp = asc2_3216[(rt_uint16_t)data * size * (size / 2) / 8 + pos];
+                for (t = 0; t < 8; t++)
+                {
+                    if (temp & 0x80)
+                        colortemp = FORE_COLOR;
+                    else
+                        colortemp = BACK_COLOR;
+                    font_buf[3 * (8 * pos + t)] = colortemp >> 16;
+                    font_buf[3 * (8 * pos + t) + 1] = colortemp >> 8;
+                    font_buf[3 * (8 * pos + t) + 2] = colortemp;
+                    temp <<= 1;
+                }
+            }
+            rt_pin_write(LCD_DC_PIN, PIN_HIGH);
+            rt_spi_send(spi_dev_lcd, font_buf, size * size / 2 * 3);
+            rt_free(font_buf);
+        }
+    }
+    else
+#endif
+    {
+        LOG_E("There is no any define ASC2_1208 && ASC2_2412 && ASC2_2416 && ASC2_3216 !");
+    }
 }
 
 /**
@@ -902,10 +923,10 @@ static rt_err_t drv_lcd_control(struct rt_device *device, int cmd, void *args)
     {
         /* update */
         rect_info = (struct rt_device_rect_info *)args;
-        if(rect_info != NULL)
+        if (rect_info != NULL)
         {
             data_start_addr = rect_info->y * LCD_BYTES_PER_PIXEL * LCD_WIDTH + rect_info->x * LCD_BYTES_PER_PIXEL;
-            for(i = 0; i < rect_info->height; i++)
+            for (i = 0; i < rect_info->height; i++)
             {
                 memcpy(&_lcd.front_buf[i * LCD_BYTES_PER_PIXEL * rect_info->width], &_lcd.lcd_info.framebuffer[data_start_addr + i * LCD_BYTES_PER_PIXEL * LCD_WIDTH], rect_info->width * LCD_BYTES_PER_PIXEL);
             }
@@ -924,11 +945,11 @@ static rt_err_t drv_lcd_control(struct rt_device *device, int cmd, void *args)
         struct rt_device_graphic_info *info = (struct rt_device_graphic_info *)args;
 
         RT_ASSERT(info != RT_NULL);
-        info->pixel_format   = lcd->lcd_info.pixel_format;
+        info->pixel_format = lcd->lcd_info.pixel_format;
         info->bits_per_pixel = lcd->lcd_info.bits_per_pixel;
-        info->width          = lcd->lcd_info.width;
-        info->height         = lcd->lcd_info.height;
-        info->framebuffer    = lcd->lcd_info.framebuffer;
+        info->width = lcd->lcd_info.width;
+        info->height = lcd->lcd_info.height;
+        info->framebuffer = lcd->lcd_info.framebuffer;
     }
     break;
     }
@@ -945,20 +966,18 @@ void turn_on_lcd_backlight(void)
 #else
 void turn_on_lcd_backlight(void)
 {
-
 }
 #endif
 
 #ifdef RT_USING_DEVICE_OPS
 const static struct rt_device_ops lcd_ops =
-{
-    drv_lcd_init,
-    RT_NULL,
-    RT_NULL,
-    RT_NULL,
-    RT_NULL,
-    drv_lcd_control
-};
+    {
+        drv_lcd_init,
+        RT_NULL,
+        RT_NULL,
+        RT_NULL,
+        RT_NULL,
+        drv_lcd_control};
 #endif
 
 int drv_lcd_ili9488_hw_init(void)
@@ -998,11 +1017,11 @@ int drv_lcd_ili9488_hw_init(void)
     memset(_lcd.lcd_info.framebuffer, 0xFF, LCD_BUF_SIZE);
     memset(_lcd.front_buf, 0xFF, LCD_BUF_SIZE);
 
-    device->type    = RT_Device_Class_Graphic;
+    device->type = RT_Device_Class_Graphic;
 #ifdef RT_USING_DEVICE_OPS
-    device->ops     = &lcd_ops;
+    device->ops = &lcd_ops;
 #else
-    device->init    = drv_lcd_init;
+    device->init = drv_lcd_init;
     device->control = drv_lcd_control;
 #endif
 
@@ -1064,10 +1083,10 @@ int ili9488_test()
     lcd_set_color(WHITE, BLACK);
 
     lcd_show_string(10, 69, 16, "Hello, RT-Thread!");
-    lcd_show_string(10, 69+16, 24, "RT-Thread");
-    lcd_show_string(10, 69+16+24, 32, "RT-Thread");
+    lcd_show_string(10, 69 + 16, 24, "RT-Thread");
+    lcd_show_string(10, 69 + 16 + 24, 32, "RT-Thread");
 
-    lcd_draw_line(0, 69+16+24+32, 320, 69+16+24+32);
+    lcd_draw_line(0, 69 + 16 + 24 + 32, 320, 69 + 16 + 24 + 32);
 
     lcd_draw_point(160, 310);
     for (int i = 0; i < 150; i += 4)
@@ -1080,15 +1099,15 @@ int ili9488_test()
     while (1)
     {
         i += 10;
-        if(i >= 120)
+        if (i >= 120)
         {
             i = 0;
         }
 
         rect_info.x = i;
         rect_info.y = i;
-        rect_info.width =LCD_WIDTH - 2 * i;
-        rect_info.height =LCD_HEIGHT - 2 * i;
+        rect_info.width = LCD_WIDTH - 2 * i;
+        rect_info.height = LCD_HEIGHT - 2 * i;
 
         /* red */
         for (int i = 0; i < LCD_BUF_SIZE / 3; i++)
@@ -1120,6 +1139,72 @@ int ili9488_test()
     }
 }
 MSH_CMD_EXPORT(ili9488_test, test ili9488 driver);
+void freshNumber()
+{
+    lcd_clear(WHITE);
+    lcd_set_color(WHITE, BLACK);
+    while (1)
+    {
+        int line = 12;
+        for (int i = 0; i < line; i++)
+        {
+            for (int j = 0; j < line; j++)
+            {
+                int p = (i + line + j) % line;
+                char chp[2] = {'A' + p, '\0'};
+                lcd_show_string(10, 10 + j * 24, 24, chp);
+            }
+            rt_thread_mdelay(1000);
+            lcd_clear(WHITE);
+            lcd_set_color(WHITE, BLACK);
+        }
+    }
+}
+MSH_CMD_EXPORT(freshNumber, freshNumber);
+
+#include "drv_lcd_test.h"
+int row = 12;
+int col = 38;
+int colWithNull = 39;
+char mFramebuffer[12][39] = {0};
+
+int curEndLine = 11;
+void increaseLineIndex() {
+    curEndLine = (row + curEndLine + 1) % row;
+}
+int getCurEndLine() {
+    return curEndLine;
+}
+int getCurTopLine() {
+    return (row + curEndLine + 1) % row;
+}
+
+void addNewLine(char lineStr[]) {
+    increaseLineIndex();
+    for (int i = 0; i < col; i++)
+    {
+        char ch = lineStr[i];
+        mFramebuffer[curEndLine][i] = ch;
+        if (ch == '\0')
+        {
+            break;
+        }
+    }
+    mFramebuffer[curEndLine][col] = '\0';
+}
+
+void freshLine() {
+    lcd_clear(WHITE);
+    lcd_set_color(WHITE, BLACK);
+    int startLine = getCurTopLine();
+    for (int i = 0; i < row; i++) {
+        int printLine = (startLine + i) % row;
+        char* chp = mFramebuffer[printLine];
+        lcd_show_string(10, 15 + i * 24, 24, chp);
+    }
+}
+MSH_CMD_EXPORT(freshLine, freshLine);
+
 #endif /* FINSH_USING_MSH */
 #endif /* DRV_DEBUG */
 #endif /* BSP_USING_SPI_LCD_ILI9488 */
