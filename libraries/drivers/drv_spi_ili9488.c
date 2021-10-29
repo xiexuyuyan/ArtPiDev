@@ -1203,7 +1203,57 @@ void freshLine() {
         lcd_show_string(10, 15 + i * 24, 24, chp);
     }
 }
-MSH_CMD_EXPORT(freshLine, freshLine);
+
+void drawButton(int x, int y, int width, int height, int radius) {
+    struct drv_lcd_device *lcd;
+    lcd = (struct drv_lcd_device *)rt_device_find("lcd");
+    struct rt_device_rect_info rect_info = {0, 0, LCD_WIDTH, LCD_HEIGHT};
+
+
+    rect_info.x = x;
+    rect_info.y = y;
+    rect_info.width = width;
+    rect_info.height = height;
+
+    for (int i = 0; i < height; i++) {
+        int startP = (y + i) * LCD_WIDTH * 3 + x * 3;
+
+        int radiusTag = 0;
+        if (i < radius || i > (height - radius)) {
+            startP += radius * 3;
+            radiusTag = 1;
+        }
+
+        for (int j = 0; j < width; j++) {
+            if ((radiusTag == 1) && j >= (width - radius * 2)) {
+                break;
+            }
+
+            lcd->lcd_info.framebuffer[startP++] = 0xDD;
+            lcd->lcd_info.framebuffer[startP++] = 0xDD;
+            lcd->lcd_info.framebuffer[startP++] = 0xDD;
+        }
+    }
+    lcd->parent.control(&lcd->parent, RTGRAPHIC_CTRL_RECT_UPDATE, &rect_info);
+
+    lcd_set_color(WHITE, 0xDDDDDD);
+    int x1 = x + radius - 1;
+    int x2 = x + width - radius;
+    int y1 = y + radius - 1;
+    int y2 = y + height - radius;
+    for (int i = 0; i < radius; i++) {
+        lcd_draw_circle(x1, y1, i);
+        lcd_draw_circle(x1, y2, i);
+        lcd_draw_circle(x2, y2, i);
+        lcd_draw_circle(x2, y1, i);
+    }
+}
+
+void draw_button() {
+    drawButton(50, 50, 100, 50, 10);
+}
+
+MSH_CMD_EXPORT(draw_button, draw_button);
 
 #endif /* FINSH_USING_MSH */
 #endif /* DRV_DEBUG */
