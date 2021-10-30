@@ -886,19 +886,7 @@ rt_err_t lcd_show_image(rt_uint16_t x, rt_uint16_t y, rt_uint16_t length, rt_uin
     return RT_EOK;
 }
 
-struct drv_lcd_device
-{
-    struct rt_device parent;
-
-    struct rt_device_graphic_info lcd_info;
-
-    struct rt_semaphore lcd_lock;
-
-    /* 0:front_buf is being used 1: back_buf is being used*/
-    rt_uint8_t cur_buf;
-    rt_uint8_t *front_buf;
-    rt_uint8_t *back_buf;
-};
+// move to header file
 
 struct drv_lcd_device _lcd;
 
@@ -1139,121 +1127,6 @@ int ili9488_test()
     }
 }
 MSH_CMD_EXPORT(ili9488_test, test ili9488 driver);
-void freshNumber()
-{
-    lcd_clear(WHITE);
-    lcd_set_color(WHITE, BLACK);
-    while (1)
-    {
-        int line = 12;
-        for (int i = 0; i < line; i++)
-        {
-            for (int j = 0; j < line; j++)
-            {
-                int p = (i + line + j) % line;
-                char chp[2] = {'A' + p, '\0'};
-                lcd_show_string(10, 10 + j * 24, 24, chp);
-            }
-            rt_thread_mdelay(1000);
-            lcd_clear(WHITE);
-            lcd_set_color(WHITE, BLACK);
-        }
-    }
-}
-MSH_CMD_EXPORT(freshNumber, freshNumber);
-
-#include "drv_lcd_test.h"
-int row = 12;
-int col = 38;
-int colWithNull = 39;
-char mFramebuffer[12][39] = {0};
-
-int curEndLine = 11;
-void increaseLineIndex() {
-    curEndLine = (row + curEndLine + 1) % row;
-}
-int getCurEndLine() {
-    return curEndLine;
-}
-int getCurTopLine() {
-    return (row + curEndLine + 1) % row;
-}
-
-void addNewLine(char lineStr[]) {
-    increaseLineIndex();
-    for (int i = 0; i < col; i++)
-    {
-        char ch = lineStr[i];
-        mFramebuffer[curEndLine][i] = ch;
-        if (ch == '\0')
-        {
-            break;
-        }
-    }
-    mFramebuffer[curEndLine][col] = '\0';
-}
-
-void freshLine() {
-    lcd_clear(WHITE);
-    lcd_set_color(WHITE, BLACK);
-    int startLine = getCurTopLine();
-    for (int i = 0; i < row; i++) {
-        int printLine = (startLine + i) % row;
-        char* chp = mFramebuffer[printLine];
-        lcd_show_string(10, 15 + i * 24, 24, chp);
-    }
-}
-
-void drawButton(int x, int y, int width, int height, int radius) {
-    struct drv_lcd_device *lcd;
-    lcd = (struct drv_lcd_device *)rt_device_find("lcd");
-    struct rt_device_rect_info rect_info = {0, 0, LCD_WIDTH, LCD_HEIGHT};
-
-
-    rect_info.x = x;
-    rect_info.y = y;
-    rect_info.width = width;
-    rect_info.height = height;
-
-    for (int i = 0; i < height; i++) {
-        int startP = (y + i) * LCD_WIDTH * 3 + x * 3;
-
-        int radiusTag = 0;
-        if (i < radius || i > (height - radius)) {
-            startP += radius * 3;
-            radiusTag = 1;
-        }
-
-        for (int j = 0; j < width; j++) {
-            if ((radiusTag == 1) && j >= (width - radius * 2)) {
-                break;
-            }
-
-            lcd->lcd_info.framebuffer[startP++] = 0xDD;
-            lcd->lcd_info.framebuffer[startP++] = 0xDD;
-            lcd->lcd_info.framebuffer[startP++] = 0xDD;
-        }
-    }
-    lcd->parent.control(&lcd->parent, RTGRAPHIC_CTRL_RECT_UPDATE, &rect_info);
-
-    lcd_set_color(WHITE, 0xDDDDDD);
-    int x1 = x + radius - 1;
-    int x2 = x + width - radius;
-    int y1 = y + radius - 1;
-    int y2 = y + height - radius;
-    for (int i = 0; i < radius; i++) {
-        lcd_draw_circle(x1, y1, i);
-        lcd_draw_circle(x1, y2, i);
-        lcd_draw_circle(x2, y2, i);
-        lcd_draw_circle(x2, y1, i);
-    }
-}
-
-void draw_button() {
-    drawButton(50, 50, 100, 50, 10);
-}
-
-MSH_CMD_EXPORT(draw_button, draw_button);
 
 #endif /* FINSH_USING_MSH */
 #endif /* DRV_DEBUG */

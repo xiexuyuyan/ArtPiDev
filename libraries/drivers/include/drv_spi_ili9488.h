@@ -34,6 +34,20 @@
 //#define GRAY187          0XBDD7
 //#define GRAY240          0XF79E
 
+struct drv_lcd_device
+{
+    struct rt_device parent;
+
+    struct rt_device_graphic_info lcd_info;
+
+    struct rt_semaphore lcd_lock;
+
+    /* 0:front_buf is being used 1: back_buf is being used*/
+    rt_uint8_t cur_buf;
+    rt_uint8_t *front_buf;
+    rt_uint8_t *back_buf;
+};
+
 int rt_hw_spi_lcd_init(void);
 
 void lcd_clear(rt_uint32_t color);
