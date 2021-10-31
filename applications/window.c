@@ -109,11 +109,6 @@ void ft6236_thread_entry(void *parameter) {
 
 #define REST_PIN GET_PIN(D, 3)
 
-void onClick(View view) {
-    rt_kprintf("button click\n");
-}
-
-
 int window_touch_init(void) {
     rt_thread_t ft6236_thread;
     struct rt_touch_config cfg;
@@ -197,20 +192,44 @@ void drawButton(View view) {
         lcd_draw_circle(x2, y2, i);
         lcd_draw_circle(x2, y1, i);
     }
+
+    lcd_set_color(0xDDDDDD, 0x0000FF);
+    char* text = view.text;
+    lcd_show_string(x+10, y + 9, 32, text);
 }
 
-void draw_button() {
-    View view;
-    view.x = 10;
-    view.y = 10;
-    view.width = 100;
-    view.height = 50;
-    view.radius = 20;
-    view.onClick = onClick;
-
-    drawButton(view);
-    rootView[0] = view;
+void onClickConfirm(View view) {
+    rt_kprintf("button click: %s.\n", view.text);
 }
 
-MSH_CMD_EXPORT(draw_button, draw_button);
+
+void onClickCacncle(View view) {
+    rt_kprintf("button click: %s.\n", view.text);
+}
+
+void initButton() {
+    View btConfirm;
+    btConfirm.x = 10;
+    btConfirm.y = BUTTON_START;
+    btConfirm.width = 100;
+    btConfirm.height = 50;
+    btConfirm.radius = 10;
+    btConfirm.text = " o k ";
+    btConfirm.onClick = onClickConfirm;
+
+    drawButton(btConfirm);
+    rootView[0] = btConfirm;
+
+    View btCancel;
+    btCancel.x = 120;
+    btCancel.y = BUTTON_START;
+    btCancel.width = 100;
+    btCancel.height = 50;
+    btCancel.radius = 10;
+    btCancel.text = " n o ";
+    btCancel.onClick = onClickCacncle;
+
+    drawButton(btCancel);
+    rootView[1] = btCancel;
+}
 /* --------------------------------------------------------------------------------- */

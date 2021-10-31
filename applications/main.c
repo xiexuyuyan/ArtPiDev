@@ -13,16 +13,24 @@
 #include "drv_common.h"
 #include <wlan_mgnt.h>
 
-// #include "drv_lcd_test.h"
+#include "drv_spi_ili9488.h"
+#include "window.h"
+#include "mlog.h"
 
 #define LED_PIN GET_PIN(I, 8)
 
 void wifi_connect(void) {
     // rt_err_t rt_wlan_connect(const char *ssid, const char *password);
     // rt_wlan_connect("Coder OldWang", "22225555");
-    rt_wlan_connect("VPN", "syrj2030");
+    // rt_wlan_connect("VPN", "syrj2030");
+    rt_wlan_connect("HUAWEI_Sample", "22225555");
 }
 MSH_CMD_EXPORT(wifi_connect, wifi_connect);
+
+void printHello() {
+    char buf[6] = {'h', 'e', 'l', 'l', 'o', '\0'};
+    addNewLineLn(buf);
+}
 
 int main(void)
 {
@@ -30,9 +38,12 @@ int main(void)
 
     rt_pin_mode(LED_PIN, PIN_MODE_OUTPUT);
 
-    // char buf[6] = {'h', 'e', 'l', 'l', 'o', '\0'};
-    // addNewLine(buf);
-    // freshLine();
+    lcd_clear(WHITE);
+    lcd_set_color(WHITE, BLACK);
+    lcd_draw_line(0, LOG_BORDER, 480, LOG_BORDER);
+    printHello();
+    initButton();
+
 
     while(count++)
     {

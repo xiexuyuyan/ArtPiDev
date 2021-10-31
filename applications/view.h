@@ -6,6 +6,7 @@ struct view {
     int width;
     int height;
     int radius;
+    char* text;
 
     void (*onClick) (struct view view);
 };

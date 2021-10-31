@@ -486,7 +486,7 @@ void lcd_draw_line(rt_uint16_t x1, rt_uint16_t y1, rt_uint16_t x2, rt_uint16_t y
         /* fast draw transverse line */
         lcd_address_set(x1, y1, x2, y2);
 
-        rt_uint8_t line_buf[960] = {0};
+        rt_uint8_t line_buf[1440] = {0};
 
         for (i = 0; i < x2 - x1; i++)
         {
